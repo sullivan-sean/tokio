@@ -9,7 +9,7 @@ use std::fmt;
 use std::io::{self, Read, Write};
 use std::net::Shutdown;
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
-use mio::uds::{stdnet as net};
+use mio::net::{stdnet as net};
 use std::path::Path;
 use std::pin::Pin;
 use std::task::{Context, Poll};
