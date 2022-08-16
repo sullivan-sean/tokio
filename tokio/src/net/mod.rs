@@ -53,4 +53,6 @@ cfg_net_unix! {
 
 cfg_net_windows! {
     pub mod windows;
+    pub use windows::listener::UnixListener;
+    pub use windows::stream::UnixStream;
 }
