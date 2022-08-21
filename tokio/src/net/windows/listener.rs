@@ -5,7 +5,7 @@ use std::convert::TryFrom;
 use std::fmt;
 use std::io;
 use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
-use mio::net::{stdnet as net};
+use mio::windows::std::net;
 use std::path::Path;
 use std::task::{Context, Poll};
 
