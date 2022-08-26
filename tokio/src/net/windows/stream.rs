@@ -4,12 +4,10 @@ use crate::net::windows::split::{split, ReadHalf, WriteHalf};
 use crate::net::windows::split_owned::{split_owned, OwnedReadHalf, OwnedWriteHalf};
 use crate::net::windows::SocketAddr;
 
-use std::convert::TryFrom;
 use std::fmt;
 use std::io::{self, Read, Write};
 use std::net::Shutdown;
-use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
-use mio::windows::std::net;
+use std::os::windows::io::{AsRawSocket, RawSocket};
 use std::path::Path;
 use std::pin::Pin;
 use std::task::{Context, Poll};
@@ -120,21 +118,6 @@ impl UnixStream {
             .try_io(interest, || self.io.try_io(f))
     }
 
-    #[track_caller]
-    pub fn from_std(stream: net::UnixStream) -> io::Result<UnixStream> {
-        let stream = mio::net::UnixStream::from_std(stream);
-        let io = PollEvented::new(stream)?;
-
-        Ok(UnixStream { io })
-    }
-
-    pub fn into_std(self) -> io::Result<net::UnixStream> {
-        self.io
-            .into_inner()
-            .map(|io| io.into_raw_socket())
-            .map(|raw_socket| unsafe { net::UnixStream::from_raw_socket(raw_socket) })
-    }
-
     pub fn pair() -> io::Result<(UnixStream, UnixStream)> {
         let (a, b) = mio::net::UnixStream::pair()?;
         let a = UnixStream::new(a)?;
@@ -173,14 +156,6 @@ impl UnixStream {
 
     pub fn into_split(self) -> (OwnedReadHalf, OwnedWriteHalf) {
         split_owned(self)
-    }
-}
-
-impl TryFrom<net::UnixStream> for UnixStream {
-    type Error = io::Error;
-
-    fn try_from(stream: net::UnixStream) -> io::Result<Self> {
-        Self::from_std(stream)
     }
 }
 

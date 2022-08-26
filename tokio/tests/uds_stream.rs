@@ -1,6 +1,5 @@
 #![cfg(feature = "full")]
 #![warn(rust_2018_idioms)]
-#![cfg(unix)]
 
 use std::io;
 use std::task::Poll;
@@ -382,7 +381,7 @@ async fn try_read_buf() -> std::io::Result<()> {
 
 // https://github.com/tokio-rs/tokio/issues/3879
 #[tokio::test]
-#[cfg(not(target_os = "macos"))]
+#[cfg(all(not(target_os = "macos"), not(target_os = "windows")))]
 async fn epollhup() -> io::Result<()> {
     let dir = tempfile::Builder::new()
         .prefix("tokio-uds-tests")

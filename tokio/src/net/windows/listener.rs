@@ -4,8 +4,7 @@ use crate::net::windows::{SocketAddr, UnixStream};
 use std::convert::TryFrom;
 use std::fmt;
 use std::io;
-use std::os::windows::io::{AsRawSocket, FromRawSocket, IntoRawSocket, RawSocket};
-use mio::windows::std::net;
+use std::os::windows::io::{AsRawSocket, RawSocket};
 use std::path::Path;
 use std::task::{Context, Poll};
 
@@ -24,20 +23,6 @@ impl UnixListener {
         let listener = mio::net::UnixListener::bind(path)?;
         let io = PollEvented::new(listener)?;
         Ok(UnixListener { io })
-    }
-
-    #[track_caller]
-    pub fn from_std(listener: net::UnixListener) -> io::Result<UnixListener> {
-        let listener = mio::net::UnixListener::from_std(listener);
-        let io = PollEvented::new(listener)?;
-        Ok(UnixListener { io })
-    }
-
-    pub fn into_std(self) -> io::Result<net::UnixListener> {
-        self.io
-            .into_inner()
-            .map(|io| io.into_raw_socket())
-            .map(|raw_socket| unsafe { net::UnixListener::from_raw_socket(raw_socket) })
     }
 
     pub fn local_addr(&self) -> io::Result<SocketAddr> {
@@ -65,14 +50,6 @@ impl UnixListener {
         let addr = SocketAddr(addr);
         let sock = UnixStream::new(sock)?;
         Poll::Ready(Ok((sock, addr)))
-    }
-}
-
-impl TryFrom<net::UnixListener> for UnixListener {
-    type Error = io::Error;
-
-    fn try_from(stream: net::UnixListener) -> io::Result<Self> {
-        Self::from_std(stream)
     }
 }
 
