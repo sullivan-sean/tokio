@@ -118,14 +118,6 @@ impl UnixStream {
             .try_io(interest, || self.io.try_io(f))
     }
 
-    pub fn pair() -> io::Result<(UnixStream, UnixStream)> {
-        let (a, b) = mio::net::UnixStream::pair()?;
-        let a = UnixStream::new(a)?;
-        let b = UnixStream::new(b)?;
-
-        Ok((a, b))
-    }
-
     pub(crate) fn new(stream: mio::net::UnixStream) -> io::Result<UnixStream> {
         let io = PollEvented::new(stream)?;
         Ok(UnixStream { io })
